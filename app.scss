@@ -1,0 +1,122 @@
+// @use '@material/theme' with (
+//   $primary: #1a002d,
+//   $secondary: #e8007c,
+//   $background: #000,
+// );
+
+$primary-color: #1a002d;
+$secondary-color: #e8007c;
+$thirdly-color: #9719b9;
+$fourthly-color: #560092;
+$background-color: #000;
+$background-light-color: #ead2f4;
+
+$body-bg: $background-color;
+
+$light: $background-light-color;
+
+$primary:    $primary-color;
+$secondary:  $secondary-color;
+$light:      $background-light-color;
+$dark:       $background-color;
+
+@import "node_modules/bootstrap/scss/bootstrap";
+
+
+
+body {
+    background-color: black;
+    color: $thirdly-color;
+    font-family: 'Anonymous Pro', "Courier New", monospace;
+}
+
+
+.banner {
+    background-color: $primary-color;
+}
+
+.banner-logo {
+    width: 15%;
+}
+
+.banner-logo img {
+    object-fit: fill;
+    width: 100%;
+}
+
+.nav-pills .nav-link.active {
+    color: $fourthly-color;
+    background-color: $background-light-color;
+}
+
+.nav-link:hover {
+    color: $fourthly-color;
+}
+
+.footer {
+    text-align: right;
+    right: 0;
+    bottom: 0;
+    padding-bottom:0;
+}
+
+//main {
+//    margin-bottom: 10vh;
+//}
+
+
+.mdc-icon-button {
+  color: $secondary-color;
+  text-decoration: $secondary-color;
+  text-decoration-color: $secondary-color;
+  outline-color: $secondary-color;
+  background-color: $primary-color;
+  fill: $secondary-color;
+  border: none;
+  --mdc-theme-primary: #1a002d;
+  --mdc-theme-secondary: #e70078;
+  --mdc-theme-background: #000;
+}
+
+.heading-icon {
+    height: 70px;
+    width: 33vw;
+    border-radius: 3px;
+    font-size: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.body-container {
+    margin-top: 74px;
+}
+
+.profile-big {
+  border-radius: 10px;
+ // display: block;
+  object-fit: fill;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mcard {
+  padding: 16px;
+  background-color: $background-light-color;
+  border-radius: 10px;
+  height:100%;
+}
+
+.center {
+//  display: block;
+  margin-left: auto;
+  margin-right: auto;
+//  width: 27%;
+}
+
+.profile-thumbnail {
+    margin-left: 3px;
+    margin-right: 3px;
+    background-color: white;
+    border-radius: 0;
+    border-color: white;
+}
