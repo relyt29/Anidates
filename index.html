@@ -15,8 +15,6 @@
         <meta name="theme-color" content="#ffffff">
 
 
-        <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">-->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@700&display=swap" rel="stylesheet">
@@ -29,19 +27,25 @@
             <header class="banner grid">
               <div class="row">
                 <section class="nav-link col-lg-2 col-sm-4 col-xs-6">
-                    <img src="heading-logo.png" class="img-fluid heading-logo">
+                    <img src="images/heading-logo.png" class="img-fluid heading-logo">
                 </section>
               </div>
               <div class="row">
               <ul class="nav nav-pills nav-justified tab-navigation " role="tablist">
                   <li class="nav-item" role="presentation">
-                     <button class="nav-link heading-icon material-icons mdc-tab mdc-icon-button" id="pills-matches-tab" data-bs-toggle="pill" data-bs-target="#pills-matches" type="button" role="tab" aria-controls="pills-matches" aria-selected="false" aria-label="Potential Matches">favorite</button>
+                     <button class="nav-link heading-icon" id="pills-matches-tab" data-bs-toggle="pill" data-bs-target="#pills-matches" type="button" role="tab" aria-controls="pills-matches" aria-selected="false" aria-label="Potential Matches">
+                         <img src="./images/heart.svg" alt="heart icon">
+                     </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                      <button class="nav-link heading-icon material-icons mdc-tab mdc-icon-button" id="pills-messages-tab" data-bs-toggle="pill" data-bs-target="#pills-messages" type="button" role="tab" aria-controls="pills-messages" aria-selected="false" aria-label="Messages">question_answer</button>
+                      <button class="nav-link heading-icon" id="pills-messages-tab" data-bs-toggle="pill" data-bs-target="#pills-messages" type="button" role="tab" aria-controls="pills-messages" aria-selected="false" aria-label="Messages">
+                         <img src="./images/message.svg" alt="heart icon">
+                      </button>
                   </li>
                   <li class="nav-item" role="presentation">
-                      <button class="nav-link active heading-icon material-icons mdc-tab mdc-icon-button" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="true" aria-current="page" aria-label="Profile">emoji_emotions</button>
+                      <button class="nav-link active heading-icon" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="true" aria-current="page" aria-label="Profile">
+                         <img src="./images/profile.svg" alt="heart icon">
+                         </button>
                   </li>
               </ul>
               </div>
@@ -51,7 +55,7 @@
                     <div class="tab-pane fade" id="pills-matches" role="tabpanel" aria-labeledby="pills-matches-tab">
                         <div class="container">
                             <div class="mcard center col-lg-5 text-center">
-                                <img class="img-fluid profile-big" alt="Potential match profile pic" src="./anon-animeta.jpg">
+                                <img class="img-fluid profile-big" alt="Potential match profile pic" src="./images/anon-animeta.jpg">
                                 <div class="profile-text-contents text-start">
                                     <h1>#2814: Animeta Name, 25</h1>
                                     <h3>Location: Boca Raton, FL</h3>
@@ -66,7 +70,7 @@
                                 <div class="list-group">
                                     <a href="#" class="list-group-item list-group-item-action">
                                         <div class="d-flex w-100">
-                                            <img src="./anon-animeta.jpg" class="img-thumbnail profile-thumbnail col-1">
+                                            <img src="./images/anon-animeta.jpg" class="img-thumbnail profile-thumbnail col-1">
                                             <h5 class="mb-1 flex-grow-1">Match #1 Heading</h5>
                                             <small class="mb-1">3 days ago</small>
                                         </div>
@@ -96,7 +100,7 @@
                     <div class="tab-pane fade show active" id="pills-profile" role="tabpanel" aria-labeledby="pills-profile-tab">
                         <div class="container">
                             <div class="mcard center col-lg-5 text-center">
-                                <img class="img-fluid profile-big" alt="Profile Pic" src="./anon-animeta.jpg">
+                                <img class="img-fluid profile-big" alt="Profile Pic" src="./images/anon-animeta.jpg">
                                 <div class="profile-text-contents text-start">
                                     <h1>#2814: Animeta Name, 25</h1>
                                     <h3>Location: Boca Raton, FL</h3>
@@ -109,8 +113,6 @@
             </div>
             </main>
             <footer class="footer mt-auto py-3">Coming soon... relyt29 on twitter, Relyt#0542 on discord</footer>
-
-            <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script> -->
 
             <script src="./bundle.js" async></script>
         </body>
