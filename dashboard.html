@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Anidates: Find your Anilove</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link href="./bundle.css" rel="stylesheet" />
+  </head>
+
+  <body class="d-flex flex-column h-100">
+    <header class="banner grid">
+      <div class="row">
+        <section class="nav-link col-lg-2 col-sm-4 col-xs-6">
+          <img src="images/heading-logo.png" class="img-fluid heading-logo" />
+        </section>
+      </div>
+      <div class="row">
+        <ul class="nav nav-pills nav-justified tab-navigation" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link heading-icon"
+              id="pills-matches-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#pills-matches"
+              type="button"
+              role="tab"
+              aria-controls="pills-matches"
+              aria-selected="false"
+              aria-label="Potential Matches"
+            >
+              <img src="./images/heart.svg" alt="heart icon" />
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link heading-icon"
+              id="pills-messages-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#pills-messages"
+              type="button"
+              role="tab"
+              aria-controls="pills-messages"
+              aria-selected="false"
+              aria-label="Messages"
+            >
+              <img src="./images/message.svg" alt="heart icon" />
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active heading-icon"
+              id="pills-profile-tab"
+              data-bs-toggle="pill"
+              data-bs-target="#pills-profile"
+              type="button"
+              role="tab"
+              aria-controls="pills-profile"
+              aria-selected="true"
+              aria-current="page"
+              aria-label="Profile"
+            >
+              <img src="./images/profile.svg" alt="heart icon" />
+            </button>
+          </li>
+        </ul>
+      </div>
+    </header>
+    <main class="flex-shrink-0">
+      <div class="container body-container tab-content" id="pills-tabContent">
+        <div
+          class="tab-pane fade"
+          id="pills-matches"
+          role="tabpanel"
+          aria-labeledby="pills-matches-tab"
+        >
+          <div class="container">
+            <div class="mcard center col-lg-5 text-center">
+              <img
+                class="img-fluid profile-big"
+                alt="Potential match profile pic"
+                src="./images/anon-animeta.jpg"
+              />
+              <div class="profile-text-contents text-start">
+                <h1>#2814: Animeta Name, 25</h1>
+                <h3>Location: Boca Raton, FL</h3>
+                <p>
+                  This is a potential match. This Animeta enjoys long walks to
+                  the refrigerator and hovercar racing on the weekends.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane fade"
+          id="pills-messages"
+          role="tabpanel"
+          aria-labeledby="pills-messages-tab"
+        >
+          <div class="container">
+            <div class="mcard center col-lg-5">
+              <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100">
+                    <img
+                      src="./images/anon-animeta.jpg"
+                      class="img-thumbnail profile-thumbnail col-1"
+                    />
+                    <h5 class="mb-1 flex-grow-1">Match #1 Heading</h5>
+                    <small class="mb-1">3 days ago</small>
+                  </div>
+                  <p class="mb-1">Some placeholder content in a paragraph.</p>
+                  <small>And some small print.</small>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Match #2 Heading</h5>
+                    <small class="text-muted">3 days ago</small>
+                  </div>
+                  <p class="mb-1">Some placeholder content in a paragraph.</p>
+                  <small class="text-muted">And some muted small print.</small>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Match #3 Heading</h5>
+                    <small class="text-muted">3 days ago</small>
+                  </div>
+                  <p class="mb-1">Some placeholder content in a paragraph.</p>
+                  <small class="text-muted">And some muted small print.</small>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane fade show active"
+          id="pills-profile"
+          role="tabpanel"
+          aria-labeledby="pills-profile-tab"
+        >
+          <div class="container">
+            <div class="mcard center col-lg-5 text-center">
+              <img
+                class="img-fluid profile-big"
+                alt="Profile Pic"
+                src="./images/anon-animeta.jpg"
+              />
+              <div class="profile-text-contents text-start">
+                <h1>#2814: Animeta Name, 25</h1>
+                <h3>Location: Boca Raton, FL</h3>
+                <p>This is my personal Animetas Profile.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer mt-auto py-3">
+      Coming soon... relyt29 on twitter, Relyt#0542 on discord
+    </footer>
+
+    <script src="./bundle.js" async></script>
+  </body>
+</html>

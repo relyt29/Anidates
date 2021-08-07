@@ -120,3 +120,21 @@ body {
     border-radius: 0;
     border-color: white;
 }
+
+#metamask-logo {
+    margin-top: 2vh;
+}
+
+#metamask-button {
+    background-color: $thirdly-color;
+    margin-top: 6vh;
+    padding-top: 4vh;
+    padding-bottom: 4vh;
+    display: block;
+    border-radius: 10px;
+    color: $light;
+    font-weight: bold;
+    border-color: $light;
+    box-shadow: 1vh 1vh $fourthly-color;
+
+}
