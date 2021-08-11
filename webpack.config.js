@@ -6,7 +6,7 @@ module.exports = {
   entry: ["./app.scss", "./app.js"],
   output: {
     filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "static"),
   },
   module: {
     rules: [

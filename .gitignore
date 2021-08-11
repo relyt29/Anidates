@@ -137,3 +137,9 @@ tags
 # Persistent undo
 [._]*.un~
 
+
+
+./venv
+__pycache__/
+venv/
+sekreti.py

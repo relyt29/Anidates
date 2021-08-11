@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Anidates: Find your Anilove</title>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png" />
+    <link rel="manifest" href="/static/site.webmanifest" />
+    <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#5bbad5" />
     <meta name="msapplication-TileColor" content="#da532c" />
     <meta name="theme-color" content="#ffffff" />
 
@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@700&display=swap"
       rel="stylesheet"
     />
-    <link href="./bundle.css" rel="stylesheet" />
+    <link href="/static/bundle.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.1/dist/web3.min.js" integrity="sha384-mO0rZLA298ttkV/47/KBl99eDPOJ8HxiPJP6OeLv0F9HwTlL7JMQqhX14VfpIFEc" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
   </head>
@@ -27,7 +27,7 @@
     <header class="banner grid">
       <div class="row">
         <section class="nav-link col-lg-2 col-sm-4 col-xs-6">
-          <img src="images/heading-logo.png" class="img-fluid heading-logo" />
+          <a href="/"><img src="/static/images/heading-logo.png" class="img-fluid heading-logo" /></a>
         </section>
       </div>
     </header>
@@ -37,7 +37,7 @@
           <div class="row">
             <img
               id="metamask-logo"
-              src="images/metamask-pixel-2.svg"
+              src="/static/images/metamask-pixel-2.svg"
               class="img-fluid"
             />
           </div>
@@ -57,6 +57,6 @@
     <footer class="footer mt-auto py-3">
       Coming soon... relyt29 on twitter, Relyt#0542 on discord
     </footer>
-    <script src="./index.js"></script>
+    <script src="/static/index.js"></script>
   </body>
 </html>
