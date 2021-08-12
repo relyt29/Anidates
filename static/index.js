@@ -20,7 +20,7 @@ async function onLogin() {
     window.alert("Please activate Metamask first.");
     return;
   }
-  console.log(coinbase);
+  //console.log(coinbase);
   var message = "Logging into Anidates";
   try {
     var signature = await web3.eth.personal.sign(message, coinbase, "");
@@ -53,8 +53,8 @@ async function onLogin() {
     })
     .fail(function (err) {
       // console.log("After verification - Error");
-      // console.log(err);
-      window.alert("You are not the user.");
+      //console.log(err);
+      window.alert(`Error logging in: ${err['responseJSON']['body']}`);
     });
 }
 

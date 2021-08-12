@@ -5,11 +5,13 @@ from flask_session import Session
 from functools import wraps
 import logging
 import sekreti
+import abis
 import redis
 
 from web3 import Web3
 from eth_account.messages import encode_defunct
 from eth_account import Account
+import psycopg2
 
 from hexbytes import HexBytes
 
@@ -28,11 +30,47 @@ logger = logging.basicConfig(level=logging.DEBUG,
                              filename="app.log",
                              filemode='a')
 app.logger = logger
+ANIMETAS_CONTRACT_ADDRESS = "0x18Df6C571F6fE9283B87f910E41dc5c8b77b7da5"
+ANIMETAS_ABI = abis.animetas_abi
+
+
+def get_db():
+    """
+    gets the DB from the flask global context.
+    :return: db handle
+    """
+    db = getattr(g, '_database', None)
+    if db is None:
+        connect_string = "dbname={} user={} password={} host=localhost".format(
+                sekreti.DB_NAME, sekreti.DB_USERNAME, sekreti.DB_PASSWORD)
+        db = g._database = psycopg2.connect(connect_string)
+    return db
+
+def get_cursor():
+    """
+    gets the cursor from the db handle
+    :return: cursor that can be used to query db
+    """
+    db = get_db()
+    return db.cursor()
+
 
 
 def get_web3():
-    w3 = Web3(Web3.IPCProvider('~/geth.ipc'))
+    w3 = getattr(g, '_web3handle', None)
+    if w3 is None:
+        w3 = sekreti.get_web3_provider()
+        g._web3handle = w3
     return w3
+
+def get_animetas_contract():
+    animetas_contract = getattr(g, '_animetascontract', None)
+    if animetas_contract is None:
+        w3 = get_web3()
+        animetas_contract = w3.eth.contract(address=ANIMETAS_CONTRACT_ADDRESS, abi=ANIMETAS_ABI)
+        g._animetascontract = animetas_contract
+    return animetas_contract
+
 
 
 def is_valid_address(address):
@@ -90,6 +128,16 @@ def init_application():
 def hello():
     return render_template('index.html')
 
+@app.route('/dbtest/<string:address>')
+@check_address_decorator
+@check_session_authentication(session)
+def dbtest(address):
+    cur = get_cursor()
+    cur.execute('SELECT version()')
+    db_version = cur.fetchone()
+    return (str(db_version), 200)
+
+
 
 @app.route("/logout/<string:address>")
 @check_address_decorator
@@ -116,11 +164,20 @@ def authenticate():
         logging.debug(signature)
         address_returned = Account.recover_message(message, signature=signature)
         if address_returned.lower() == request.json['address'].lower():
-            session[address_returned.lower()] = 'in-session'
-            # logging.debug(session)
-            return jsonify({'success': True, 'body': address_returned.lower()}), 200, {'ContentType':'application/json'}
+            # we've determined it's a valid signature on a real ETH address.
+            animetas_contract = get_animetas_contract()
+            try:
+                number_animetas_held = animetas_contract.functions.balanceOf(address_returned).call()
+                if number_animetas_held > 0:
+                    session[address_returned.lower()] = 'in-session'
+                    return jsonify({'success': True, 'body': address_returned.lower()}), 200, {'ContentType':'application/json'}
+                else:
+                    return jsonify({'body': 'Invalid user: You dont hold any animetas!'}), 400, {'ContentType':'application/json'}
+            except:
+                return jsonify({'body': 'Some kind of error calling animetas contract, contact the devs'}), 500, {'ContentType':'application/json'}
+
         else:
-            return jsonify({'body': 'invalid user'}), 400, {'ContentType':'application/json'}
+            return jsonify({'body': 'Invalid user: ETH address signature invalid'}), 400, {'ContentType':'application/json'}
 
 
 @app.route("/dashboard/<string:address>")
