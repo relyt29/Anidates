@@ -52,7 +52,7 @@ def get_cursor():
     :return: cursor that can be used to query db
     """
     db = get_db()
-    return db.cursor()
+    return db, db.cursor()
 
 
 
@@ -82,6 +82,10 @@ def is_valid_address(address):
     web3_handle = get_web3()
     return web3_handle.isAddress(address)
 
+def to_checksum_address(address):
+    web3_handle = get_web3()
+    return web3_handle.toChecksumAddress(address)
+
 
 def check_address_decorator(fn):
     @wraps(fn)
@@ -109,7 +113,7 @@ def check_session_authentication(session):
                 address = args[0]
             #logging.debug("Address from wrapping")
             #logging.debug(address)
-            if session.get(address.lower()) is None:
+            if session.get(address) is None:
                 #logging.debug("Session is not authenticated")
                 return redirect(url_for('hello'))
             return function(*args, **kwargs)
@@ -123,6 +127,20 @@ def check_session_authentication(session):
 def init_application():
     sess.init_app(app)
 
+@app.before_first_request
+def init_db():
+    db, cur = get_cursor()
+    create_sql = """CREATE TABLE IF NOT EXISTS userprofiles(
+                        eth_address TEXT NOT NULL UNIQUE,
+                        token_id INTEGER,
+                        name TEXT,
+                        age INTEGER,
+                        location TEXT,
+                        profile_text TEXT
+                    );"""
+                        #UNIQUE (eth_address)
+    cur.execute(create_sql)
+    db.commit()
 
 @app.route("/")
 def hello():
@@ -132,7 +150,7 @@ def hello():
 @check_address_decorator
 @check_session_authentication(session)
 def dbtest(address):
-    cur = get_cursor()
+    _, cur = get_cursor()
     cur.execute('SELECT version()')
     db_version = cur.fetchone()
     return (str(db_version), 200)
@@ -163,30 +181,104 @@ def authenticate():
         logging.debug(message)
         logging.debug(signature)
         address_returned = Account.recover_message(message, signature=signature)
-        if address_returned.lower() == request.json['address'].lower():
-            # we've determined it's a valid signature on a real ETH address.
-            animetas_contract = get_animetas_contract()
-            try:
-                number_animetas_held = animetas_contract.functions.balanceOf(address_returned).call()
-                if number_animetas_held > 0:
-                    session[address_returned.lower()] = 'in-session'
-                    return jsonify({'success': True, 'body': address_returned.lower()}), 200, {'ContentType':'application/json'}
-                else:
-                    return jsonify({'body': 'Invalid user: You dont hold any animetas!'}), 400, {'ContentType':'application/json'}
-            except:
-                return jsonify({'body': 'Some kind of error calling animetas contract, contact the devs'}), 500, {'ContentType':'application/json'}
+        address_returned = to_checksum_address(address_returned)
+        if is_valid_address(request.json['address']):
+            if address_returned == to_checksum_address(request.json['address']):
+                # we've determined it's a valid signature on a real ETH address.
+                animetas_contract = get_animetas_contract()
+                try:
+                    number_animetas_held = animetas_contract.functions.balanceOf(address_returned).call()
+                    if number_animetas_held > 0:
+                        session[address_returned] = 'in-session'
+                        return jsonify({'success': True, 'body': address_returned}), 200, {'ContentType':'application/json'}
+                    else:
+                        return jsonify({'body': 'Invalid user: You dont hold any animetas!'}), 400, {'ContentType':'application/json'}
+                except:
+                    return jsonify({'body': 'Some kind of error calling animetas contract, contact the devs'}), 500, {'ContentType':'application/json'}
 
-        else:
-            return jsonify({'body': 'Invalid user: ETH address signature invalid'}), 400, {'ContentType':'application/json'}
+        return jsonify({'body': 'Invalid user: ETH address signature invalid'}), 400, {'ContentType':'application/json'}
+
+def write_db_user_profile(address, token_id, name, age, location, profile_text):
+    db, cur = get_cursor()
+    assert is_valid_address(address)
+    insert_sql = """INSERT INTO userprofiles (
+                        eth_address,
+                        token_id,
+                        name,
+                        age,
+                        location,
+                        profile_text)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (eth_address)
+                    DO
+                    UPDATE SET
+                    token_id=EXCLUDED.token_id,
+                    name=EXCLUDED.name,
+                    age=EXCLUDED.age,
+                    location=EXCLUDED.location,
+                    profile_text=EXCLUDED.profile_text;
+                    """
+    cur.execute(insert_sql,( address, token_id, name, age, location, profile_text))
+    db.commit()
+
+
+def new_animeta(address, animetas_contract):
+    token_id = int(animetas_contract.functions.tokenOfOwnerByIndex(address, 0).call())
+    name = "Animeta #{}".format(token_id)
+    age = "1000"
+    location = "The Metaverse"
+    profile_text = "This is some default profile text. Why don't you edit it, eh?"
+    write_db_user_profile(address, token_id, name, age, location, profile_text)
+    return token_id, name, age, location, profile_text
+
+
+# User profile is made up of:
+# Public ETH Addr
+# Animeta token ID
+# Picture (indexed by token_id)
+# Animeta user defined Name
+# Animeta age
+# Animeta location
+# Animeta profile text.
+def get_current_profile(address):
+    _,cur = get_cursor()
+    # should be sanitized for SQLI by psycopg2, using this syntax
+    rows = cur.execute("SELECT token_id, name, age, location, profile_text FROM userprofiles WHERE eth_address = %s", (address,))
+    if rows:
+        assert len(rows) < 2 and len(rows) >= 0
+    else:
+        rows = []
+    animetas_contract = get_animetas_contract()
+    number_animetas_held = animetas_contract.functions.balanceOf(address).call()
+    assert number_animetas_held > 0
+    if len(rows) == 0:
+        (token_id, name, age, location, profile_text) = new_animeta(address, animetas_contract)
+    else:
+        (token_id, name, age, location, profile_text) = rows[0]
+        found = False
+        for i in range(0, number_animetas_held-1):
+            test_token_id = animetas_contract.functions.tokenOfOwnerByIndex(address, i).call()
+            if test_token_id == token_id:
+                found = True
+        if not found:
+            (token_id, name, age, location, profile_text) = new_animeta(address, animetas_contract)
+    return token_id, name, age, location, profile_text
+
+
+
+
 
 
 @app.route("/dashboard/<string:address>")
 @check_address_decorator
 @check_session_authentication(session)
 def dashboard(address):
-    return render_template('dashboard.html', address=address)
+    (token_id, name, age, location, profile_text) = get_current_profile(address)
+    # jinja2 should sanitize XSS so we are good there
+    return render_template('dashboard.html', token_id=token_id, name=name, age=age, location=location, profile_text=profile_text)
 
 
 if __name__ == "__main__":
+    # TODO: CSRF - flask.wtf etc
     app.run(host='127.0.0.1', port=8080, debug=True)
 
