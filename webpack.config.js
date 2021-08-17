@@ -1,13 +1,15 @@
 const autoprefixer = require("autoprefixer");
 const path = require("path");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 module.exports = {
-  mode: "production",
-  entry: ["./app.scss", "./app.js"],
+  //mode: "production",
+  mode: "development",
+  entry: { "cssBundle":"./app.scss", "bundle":"./app.js", "indexBundle":"./index.ts"},
   output: {
-    filename: "bundle.js",
     path: path.resolve(__dirname, "static"),
   },
+  plugins: [new NodePolyfillPlugin()],
   module: {
     rules: [
       {
@@ -34,11 +36,11 @@ module.exports = {
           },
         ],
       },
-      //{
-      //  test: /\.tsx?$/,
-      //  use: "ts-loader",
-      //  exclude: /node_modules/,
-      //},
+      {
+        test: /\.tsx?$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
     ],
   },
   //resolve: {
