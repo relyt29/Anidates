@@ -73,7 +73,10 @@ async function doWalletConnecting() {
     })
       .done(function (result) {
         // console.log("After verification");
-        if (result.success) window.location.href = "/dashboard/" + result.body;
+        if (result.success) {
+          //console.log(result.body);
+          window.location.href = result.body;
+        }
         else window.alert("Bad User!");
       })
       .fail(function (err) {

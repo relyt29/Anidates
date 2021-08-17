@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
 from flask import Flask, render_template, request, redirect, g, url_for, session, jsonify, Response
+#from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_discord import DiscordOAuth2Session, requires_authorization, Unauthorized
 from flask_session import Session
+#import os
+from flask_cors import CORS
 from functools import wraps
 import logging
 import sekreti
@@ -17,6 +21,7 @@ from hexbytes import HexBytes
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+#os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "true"      # !! Only in development environment.
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 app.config['SESSION_TYPE'] = sekreti.SESSION_TYPE
@@ -24,7 +29,13 @@ app.config['SESSION_REDIS'] = sekreti.SESSION_REDIS
 app.config['SECRET_KEY'] = sekreti.SECRET_KEY
 app.config['SESSION_PERMANENT'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = sekreti.PERMANENT_SESSION_LIFETIME
+
+app.config["DISCORD_CLIENT_ID"] = sekreti.DISCORD_CLIENT_ID
+app.config["DISCORD_CLIENT_SECRET"] = sekreti.DISCORD_CLIENT_SECRET
+app.config["DISCORD_REDIRECT_URI"] = sekreti.DISCORD_REDIRECT_URI
+
 sess = Session()
+discord = DiscordOAuth2Session(app)
 
 logger = logging.basicConfig(level=logging.DEBUG,
                              filename="app.log",
@@ -32,7 +43,7 @@ logger = logging.basicConfig(level=logging.DEBUG,
 app.logger = logger
 ANIMETAS_CONTRACT_ADDRESS = "0x18Df6C571F6fE9283B87f910E41dc5c8b77b7da5"
 ANIMETAS_ABI = abis.animetas_abi
-
+#CORS(app) # TODO scope to minimum scope necessary
 
 def get_db():
     """
@@ -73,30 +84,30 @@ def get_animetas_contract():
 
 
 
-def is_valid_address(address):
+def is_valid_address(eth_address):
     """
     checks if an address is of the right structure to be an ethereum addresss
     :param address: the address to check
     :return:
     """
     web3_handle = get_web3()
-    return web3_handle.isAddress(address)
+    return web3_handle.isAddress(eth_address)
 
-def to_checksum_address(address):
+def to_checksum_address(eth_address):
     web3_handle = get_web3()
-    return web3_handle.toChecksumAddress(address)
+    return web3_handle.toChecksumAddress(eth_address)
 
 
 def check_address_decorator(fn):
     @wraps(fn)
     def wrapped(*args, **kwargs):
         # Because the address is sometimes in args and sometimes in kwargs
-        address = None
-        if 'address' in kwargs:
-            address = kwargs['address']
+        eth_address = None
+        if 'eth_address' in kwargs:
+            eth_address = kwargs['eth_address']
         else:
-            address = args[0]
-        if not is_valid_address(address):
+            eth_address = args[0]
+        if not is_valid_address(eth_address):
             return render_template("error.html")
         return fn(*args, **kwargs)
 
@@ -107,13 +118,13 @@ def check_session_authentication(session):
     def inner_function(function):
         @wraps(function)
         def wrapped(*args, **kwargs):
-            if 'address' in kwargs:
-                address = kwargs['address']
+            if 'eth_address' in kwargs:
+                eth_address = kwargs['eth_address']
             else:
-                address = args[0]
+                eth_address = args[0]
             #logging.debug("Address from wrapping")
-            #logging.debug(address)
-            if session.get(address) is None:
+            #logging.debug(eth_address)
+            if session.get(eth_address) is None:
                 #logging.debug("Session is not authenticated")
                 return redirect(url_for('hello'))
             return function(*args, **kwargs)
@@ -146,23 +157,38 @@ def init_db():
 def hello():
     return render_template('index.html')
 
-@app.route('/dbtest/<string:address>')
+@app.route('/dbtest/<string:eth_address>')
 @check_address_decorator
 @check_session_authentication(session)
-def dbtest(address):
+def dbtest(eth_address):
     _, cur = get_cursor()
     cur.execute('SELECT version()')
     db_version = cur.fetchone()
     return (str(db_version), 200)
 
+@app.route("/discordant")
+def discordant():
+    data = discord.callback()
+    user = discord.fetch_user()
+    # there might be an attack here, maybe, I'm not sure
+    # around using client-side provided info for the eth_address
+    # but it might be hashed server side so we might be good?
+    # idk, need to think more about it
+    addy = str(data['eth_address'])
+    session[addy] = str(user.id)
+    url_construct = url_for('dashboard', eth_address=addy)
+    return redirect(url_construct)
 
+@app.errorhandler(Unauthorized)
+def redirect_unauthorized(e):
+    return redirect(url_for('hello'))
 
-@app.route("/logout/<string:address>")
+@app.route("/logout/<string:eth_address>")
 @check_address_decorator
 @check_session_authentication(session)
-def logout(address):
+def logout(eth_address):
     # remove the key from the session
-    session.pop(address.lower(), None)
+    session.pop(eth_address, None)
     return redirect(url_for('hello'))
 
 @app.errorhandler(404)
@@ -189,8 +215,8 @@ def authenticate():
                 try:
                     number_animetas_held = animetas_contract.functions.balanceOf(address_returned).call()
                     if number_animetas_held > 0:
-                        session[address_returned] = 'in-session'
-                        return jsonify({'success': True, 'body': address_returned}), 200, {'ContentType':'application/json'}
+                        redirect_obj = discord.create_session(scope=['identify'],data={"eth_address": address_returned})
+                        return jsonify({'success': True, 'body': redirect_obj.location}), 200, {'ContentType':'application/json'}
                     else:
                         return jsonify({'body': 'Invalid user: You dont hold any animetas!'}), 400, {'ContentType':'application/json'}
                 except:
@@ -269,16 +295,22 @@ def get_current_profile(address):
 
 
 
-@app.route("/dashboard/<string:address>")
+@app.route("/dashboard/<string:eth_address>")
+@requires_authorization
 @check_address_decorator
 @check_session_authentication(session)
-def dashboard(address):
-    (token_id, name, age, location, profile_text) = get_current_profile(address)
+def dashboard(eth_address):
+    (token_id, name, age, location, profile_text) = get_current_profile(eth_address)
     # jinja2 should sanitize XSS so we are good there
     return render_template('dashboard.html', token_id=token_id, name=name, age=age, location=location, profile_text=profile_text)
 
 
+
 if __name__ == "__main__":
+    # App is behind one proxy that sets the -For and -Host headers.
+    #proxied_app = ProxyFix(app, x_for=1, x_host=1)
     # TODO: CSRF - flask.wtf etc
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    #app.run(host='127.0.0.1', port=8080, debug=True)
+    from waitress import serve
+    serve(app, listen='127.0.0.1:8080', url_scheme='https')
 
